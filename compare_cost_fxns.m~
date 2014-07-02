@@ -8,8 +8,9 @@
 %  %function used in Ng's course (Method A) with a different method
 %  %(Method B). The objective function in Method A is derived from the principal
 %  %of maximum likelihood estimation, while the objective function in Method B
-%  %is based on The Kelly Criterion (i.e. doubling rate of wealth).  The 
-%  %objective is to predict an applicant's probability of acceptance (1)
+%  %is based on The Kelly Criterion, and more specifically, doubling rate of wealth.
+%  %Method B
+%  %The objective is to predict an applicant's probability of acceptance (1)
 %  %or rejection (0) based on two exam scores. 
 %
 
@@ -24,8 +25,7 @@ data = load('ex2data1.txt');
 X = data(:, [1, 2]); y = data(:, 3);
 
 %% ==================== Visualize Data ====================
-%  Start by first plotting the data to understand the 
-%  the problem.
+%  Start by plotting the data to understand the problem.
 
 fprintf(['Plotting data with + indicating (y = 1) examples and o ' ...
          'indicating (y = 0) examples.\n']);
@@ -113,9 +113,9 @@ hold off;
 % the mutual information between the distribution of event outcomes (y) and 
 % our side information (X).  So by knowing X, uncertainty in the outcomes of y 
 % has been reduced by 0.6774 bits.  This method proves to be a useful 
-% model scoring procedure, for example, if we were to obtain information about 
+% model scoring procedure. For example, if we were to obtain information about 
 % a third test score we could measure the resulting change in mutual information.
-% Likewise, the scoring method could be used to compare a model across
+% Likewise, the scoring method could be used to assess model strength across
 % training, validation, and test data sets.
 empirical_wealth = costFunctionDRW(theta, X, y);
 log_wealth = log2(empirical_wealth);
