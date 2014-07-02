@@ -1,0 +1,129 @@
+%% Variation on Exercise 2 from Coursera Machine Learning
+%
+%  Abstract
+%  ------------
+%  %Exercise 2 from Andrew Ng's Machine Learning Cousera course trains
+%  %a logistic regression model using unconstrained nonlinear optimization.  
+%  %The following code will compare the optimization objective 
+%  %function used in Ng's course (Method A) with a different method
+%  %(Method B). The objective function in Method A is derived from the principal
+%  %of maximum likelihood estimation, while the objective function in Method B
+%  %is based on The Kelly Criterion.  More specifically, doubling rate of wealth.  
+%  %The objective is to predict an applicant's probability of acceptance (1)
+%  %or rejection (0) based on two exam scores. 
+%
+
+%% ==================== Initialization ====================
+clear ; close all; clc
+
+%% ==================== Load Data ====================
+%  The first two columns contains the exam scores (x1 & x2) and the third column
+%  contains the label (y).
+
+data = load('ex2data1.txt');
+X = data(:, [1, 2]); y = data(:, 3);
+
+%% ==================== Visualize Data ====================
+%  Start by plotting the data to understand the problem.
+
+fprintf(['Plotting data with + indicating (y = 1) examples and o ' ...
+         'indicating (y = 0) examples.\n']);
+
+plotData(X, y);
+
+% Put some labels 
+hold on;
+% Labels and Legend
+xlabel('Exam 1 score')
+ylabel('Exam 2 score')
+
+% Specified in plot order
+legend('Admitted', 'Not admitted')
+hold off;
+
+%% ============ Setup ============
+%  Setup the data matrix
+[m, n] = size(X);
+% Add intercept term to X
+X = [ones(m, 1) X];
+% Initialize fitting parameters
+initial_theta = zeros(n + 1, 1);
+
+
+%% METHOD A: Find optimal theta using MLE cost function 
+%  Run fminunc to obtain the optimal theta
+[theta,fval,exitflag,output] = ...
+	fminunc(@(t)(costFunction(t, X, y)), initial_theta, optimset('GradObj', 'on', 'MaxIter', 400)); %#ok<NASGU,ASGLU>
+% Print theta to screen
+fprintf('theta: \n');
+fprintf(' %f \n', theta);
+
+% Compute accuracy on the training set
+p = predict(theta, X);
+p = mean(double(p == y)) * 100;
+
+% Plot Boundary
+plotDecisionBoundary(theta, X, y);
+% Put some labels 
+hold on;
+% Labels and Legend
+title(['Method A Prediction Accuracy (%):  ',int2str(p)])
+xlabel('Exam 1 score')
+ylabel('Exam 2 score')
+% Specified in plot order
+legend('Admitted', 'Not admitted')
+hold off;
+
+
+
+%% METHOD B: Find optimal theta using Doubling Rate of Wealth
+%  Run fminsearch to obtain the optimal theta (no gradient required)
+%  NOTE: maximizing doubling rate of wealth, so assign a negative 
+%  sign to the cost function in order to minimize using fminsearch
+[theta,fval,exitflag,output] = ...
+    fminsearch(@(t) -costFunctionDRW(t, X, y),initial_theta,optimset('MaxFunEvals', 400));
+
+% Print theta to screen
+fprintf('theta: \n');
+fprintf(' %f \n', theta);
+
+% Compute accuracy on the training set
+p = predict(theta, X);
+p = mean(double(p == y)) * 100;
+
+% Plot Boundary
+plotDecisionBoundary(theta, X, y);
+% Put some labels 
+hold on;
+% Labels and Legend
+title(['Method B Prediction Accuracy (%):  ',int2str(p)])
+xlabel('Exam 1 score')
+ylabel('Exam 2 score')
+% Specified in plot order
+legend('Admitted', 'Not admitted')
+hold off;
+
+%% Interpretation of Method B (Doubling Rate of Wealth Method)
+% Without side information, i.e. information about applicants' test scores, 
+% the doubling rate of wealth is zero (from betting proportional to the 
+% marginal probability of event outcomes).  With side information 
+% (x1, x2) the doubling rate of wealth increases to 0.6774.  The change in 
+% doubling rate of wealth given side information can thus be interpreted as 
+% the mutual information between the distribution of event outcomes (y) and 
+% our side information (X).  So by knowing X, uncertainty in the outcomes of y 
+% has been reduced by 0.6774 bits.  This method proves to be a useful 
+% model scoring procedure. For example, if we were to obtain information about 
+% a third test score we could measure the resulting change in mutual information.
+% Likewise, the scoring method could be used to assess model strength across
+% training, validation, and test data sets.
+empirical_wealth = costFunctionDRW(theta, X, y);
+log_wealth = log2(empirical_wealth);
+drw = (1/length(y))*log_wealth; 
+
+
+
+
+
+
+
+
