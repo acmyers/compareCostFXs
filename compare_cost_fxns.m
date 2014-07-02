@@ -10,7 +10,7 @@
 %  %of maximum likelihood estimation, while the objective function in Method B
 %  %is based on The Kelly Criterion, and more specifically, doubling rate of wealth.
 %  %Method B comes from the course 'New Opportunities in Big Data' taught
-%  %at Duke University.
+%  %by Daniel Egger at Duke University.
 %
 %  %The objective is to predict an applicant's probability of acceptance (1)
 %  %or rejection (0) based on two exam scores. 
